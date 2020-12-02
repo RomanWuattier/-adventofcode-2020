@@ -4,16 +4,19 @@ import com.romanwuattier.adventofcode2020.common.Day;
 import lombok.Value;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Day2 implements Day {
     public static void main(String[] args) {
         new Day2().printParts();
     }
 
+    private final List<Policy> policies = getPolicies();
+
     @Override
     public Object part1() {
-        return getPolicies().filter(policy -> {
+        return policies.stream().filter(policy -> {
             long occ = policy.pwd.chars().filter(c -> c == policy.c).count();
             return occ >= policy.min && occ <= policy.max;
         }).count();
@@ -21,24 +24,25 @@ public class Day2 implements Day {
 
     @Override
     public Object part2() {
-        return getPolicies().filter(policy -> {
+        return policies.stream().filter(policy -> {
             char[] pwd = policy.pwd.toCharArray();
             return (pwd[policy.min - 1] == policy.c) != (pwd[policy.max - 1] == policy.c);
         }).count();
     }
 
-    private Stream<PwdPolicy> getPolicies() {
+    private List<Policy> getPolicies() {
         return Arrays.stream(readDay(2).split(System.lineSeparator()))
-                     .map(line -> line.split(" "))
-                     .map(line -> {
-                         int min = Integer.parseInt(line[0].split("-")[0]);
-                         int max = Integer.parseInt(line[0].split("-")[1]);
-                         return new PwdPolicy(min, max, line[1].charAt(0), line[2]);
-                     });
+                     .map(l -> l.split(" "))
+                     .map(w -> {
+                         int min = Integer.parseInt(w[0].split("-")[0]);
+                         int max = Integer.parseInt(w[0].split("-")[1]);
+                         return new Policy(min, max, w[1].charAt(0), w[2]);
+                     })
+                     .collect(Collectors.toUnmodifiableList());
     }
 
     @Value
-    private static class PwdPolicy {
+    private static class Policy {
         int min, max;
         char c;
         String pwd;
