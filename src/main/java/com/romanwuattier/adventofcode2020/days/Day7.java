@@ -1,7 +1,6 @@
 package com.romanwuattier.adventofcode2020.days;
 
 import com.romanwuattier.adventofcode2020.common.Day;
-import lombok.Value;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,9 +81,6 @@ public class Day7 implements Day {
                       .sum();
     }
 
-    @Value
-    private static class Bag {
-        String name;
-        int qte;
+    private record Bag(String name, int qte) {
     }
 }

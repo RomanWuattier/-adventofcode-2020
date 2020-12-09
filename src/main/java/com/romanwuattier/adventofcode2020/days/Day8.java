@@ -1,7 +1,6 @@
 package com.romanwuattier.adventofcode2020.days;
 
 import com.romanwuattier.adventofcode2020.common.Day;
-import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,16 +45,13 @@ public class Day8 implements Day {
     }
 
     private Optional<Inst> swap(Inst inst) {
-        switch (inst.op) {
-            case "acc":
-                return Optional.empty(); // Nothing to do. Return empty to avoid useless computation in part 2
-            case "nop":
-                return Optional.of(new Inst("jmp", inst.arg));
-            case "jmp":
-                return Optional.of(new Inst("nop", inst.arg));
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (inst.op) {
+            // Nothing to do. Return empty to avoid useless computation in part 2
+            case "acc" -> Optional.empty();
+            case "nop" -> Optional.of(new Inst("jmp", inst.arg));
+            case "jmp" -> Optional.of(new Inst("nop", inst.arg));
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     private Inst run(List<Inst> insts) {
@@ -69,26 +65,18 @@ public class Day8 implements Day {
             seen.add(index);
             var inst = insts.get(index);
             switch (inst.op) {
-                case "nop":
-                    index++;
-                    break;
-                case "acc":
+                case "nop" -> index++;
+                case "acc" -> {
                     acc += inst.arg;
                     index++;
-                    break;
-                case "jmp":
-                    index += inst.arg;
-                    break;
-                default:
-                    throw new IllegalArgumentException();
+                }
+                case "jmp" -> index += inst.arg;
+                default -> throw new IllegalArgumentException();
             }
         }
         return new Inst("exit", acc);
     }
 
-    @Value
-    private static class Inst {
-        String op;
-        int arg;
+    private record Inst(String op, int arg) {
     }
 }

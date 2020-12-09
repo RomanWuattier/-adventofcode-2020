@@ -1,7 +1,6 @@
 package com.romanwuattier.adventofcode2020.days;
 
 import com.romanwuattier.adventofcode2020.common.Day;
-import lombok.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,10 +40,6 @@ public class Day2 implements Day {
                      .collect(Collectors.toUnmodifiableList());
     }
 
-    @Value
-    private static class Policy {
-        int min, max;
-        char c;
-        String pwd;
+    private record Policy(int min, int max, char c, String pwd) {
     }
 }
