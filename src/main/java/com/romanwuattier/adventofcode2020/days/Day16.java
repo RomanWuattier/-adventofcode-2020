@@ -2,9 +2,11 @@ package com.romanwuattier.adventofcode2020.days;
 
 import com.romanwuattier.adventofcode2020.common.Day;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day16 implements Day {
     public static void main(String[] args) {
@@ -24,6 +26,12 @@ public class Day16 implements Day {
                                                       .map(Integer::valueOf)
                                                       .collect(Collectors.toUnmodifiableList());
 
+    private final List<Integer> myTickets = Arrays.stream(chunks.get(1).split(System.lineSeparator()))
+                                                  .skip(1)
+                                                  .flatMap(l -> Arrays.stream(l.split(",")))
+                                                  .map(Integer::parseInt)
+                                                  .collect(Collectors.toUnmodifiableList());
+
     @Override
     public Object part1() {
         return nearbyTickets.stream()
@@ -34,7 +42,48 @@ public class Day16 implements Day {
 
     @Override
     public Object part2() {
-        return null;
+        var validNearbyTickets = nearbyTickets.stream()
+                                              .filter(ticket -> isValid(ticket, rules))
+                                              .collect(Collectors.toUnmodifiableSet());
+
+        var nearbyMatrix = Arrays.stream(chunks.get(2).split(System.lineSeparator()))
+                                 .skip(1)
+                                 .map(l -> Arrays.stream(l.split(","))
+                                                 .map(Integer::parseInt)
+                                                 .collect(Collectors.toUnmodifiableList()))
+                                 .filter(validNearbyTickets::containsAll)
+                                 .collect(Collectors.toUnmodifiableList());
+
+        List<List<Rule>> columnToRule = IntStream.range(0, myTickets.size())
+                                                 .mapToObj(i -> new ArrayList<Rule>())
+                                                 .collect(Collectors.toList());
+
+        rules.forEach(rule -> IntStream.range(0, myTickets.size()).forEach(col -> {
+            var allMatch = nearbyMatrix.stream()
+                                       .map(row -> row.get(col))
+                                       .allMatch(val -> isValidRule(val, rule));
+            if (allMatch) {
+                columnToRule.get(col).add(rule);
+            }
+        }));
+
+        var res = 1L;
+        var step = 0;
+        while (step < 6) {
+            for (var i = 0; i < columnToRule.size(); i++) {
+                var col = columnToRule.get(i);
+                if (col.size() == 1) {
+                    var rule = col.get(0);
+                    columnToRule.forEach(col_ -> col_.remove(rule));
+
+                    if (rule.name.contains("departure")) {
+                        res *= myTickets.get(i);
+                        step++;
+                    }
+                }
+            }
+        }
+        return res;
     }
 
     private Rule parseRules(String rules) {

@@ -13,5 +13,6 @@ public class Day16Test {
 
     @Test
     public void part2() {
+        assertEquals(1439429522627L, new Day16().part2());
     }
 }
